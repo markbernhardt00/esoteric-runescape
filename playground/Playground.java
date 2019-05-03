@@ -39,26 +39,30 @@ public class Playground extends Script {
                 fight an NPC
         */
 
-        GroundItem ground_bones = getGroundItems().closest(gi -> gi != null && gi.getName().equals("Bones") && getMap().canReach(gi));
+        GroundItem ground_bones = getGroundItems().closest(gi -> gi != null && gi.getName().equals("Bones") && gi.getPosition().distance(myPosition()) < 7);
         boolean pickable_bones = ground_bones != null;
 
         //if not in combat and not moving -> do something
         if(!getCombat().isFighting() && !myPlayer().isMoving())
         {
+            log("I am not fighting... nor am I moving so I will: ");
             //if my inventory is full -> bury the bones
             if(getInventory().isFull())
             {
+                log("Bury bones because my inventory is full");
                 bury_bones();
             }
             //else if there are bones on the ground -> pick them up
             else if(pickable_bones)
             {
+                log("Pick up some available bones");
                 pickUp("Bones");
             }
             //else fight an NPC
             else
             {
-                fightNPC("Goblin");
+                log("Fight a Goblin");
+                fightNPC("Chicken");
             }
         }
 
@@ -68,8 +72,18 @@ public class Playground extends Script {
 
     private void bury_bones() {
         Inventory inv = getInventory();
+
        if(inv.contains("Bones")){
-           if(inv.getItem("Bones").interact("Bones"));
+           if(inv.getItem("Bones").interact("Bury")){
+               new ConditionalSleep(30000, 1000)
+               {
+                   @Override
+                   public boolean condition() throws InterruptedException {
+                       inv.getItem("Bones").interact("Bury");
+                       return !getInventory().contains("Bones");
+                   }
+               }.sleep();
+           }
        }
        else {
            inv.deselectItem();
@@ -131,11 +145,11 @@ public class Playground extends Script {
     private void travelToEntity(Entity entity)
     {
         //Getting within 4 tiles of an entity -- pretty close for safe interactions
-        if(getWalking().walk(entity)){
+        if(getWalking().webWalk(entity.getPosition())){
             new ConditionalSleep(12000, 6000) {
                 @Override
                 public boolean condition() throws InterruptedException {
-                    return entity.getPosition().distance(myPosition()) < 4;
+                    return entity.getPosition().distance(myPosition()) < 7;
                 }
             }.sleep();
     }
@@ -162,8 +176,11 @@ public class Playground extends Script {
         {
             boolean closeEnough = ground_bones.getPosition().distance(myPosition()) < 7;
             if (closeEnough) {
-
-
+                if(!ground_bones.isVisible())
+                {
+                    log("I cant see the bones, so I am panning the camera");
+                    getCamera().toEntity(ground_bones);
+                }
                 int lastCount = getInventory().getEmptySlotCount();
                 if (ground_bones.interact("Take")) {
                     new ConditionalSleep(3000, 1000) {
@@ -176,6 +193,7 @@ public class Playground extends Script {
             }
             else
             {
+                log("Traveling to the bones");
                 travelToEntity(ground_bones);
             }
         }
