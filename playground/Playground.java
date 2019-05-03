@@ -8,21 +8,49 @@ import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.script.Script;
 import org.osbot.rs07.script.ScriptManifest;
 import org.osbot.rs07.utility.ConditionalSleep;
+import javax.swing.*;
+import playground.GUI;
+import java.lang.reflect.InvocationTargetException;
+
 
 import java.awt.*;
 
 @ScriptManifest(author = "EsotericRS", info = "", logo = "", name = "Playground Script", version = 0.1)
 public class Playground extends Script {
 
+    private GUI gui = new GUI();
+    private String enemy;
+
     @Override
     //Executes once on script start
     public void onStart() throws InterruptedException {
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                gui = new GUI();
+                gui.open();
+            });
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+            stop();
+            return;
+        }
+        if (!gui.isStarted()) {
+            stop();
+            return;
+        }
+
+        enemy = gui.getSelectedEnemy();
     }
+
+    //JIC user closes the dialog and doesn't click the start button
+
 
     @Override
     //Executes once on script exit
     public void onExit() throws InterruptedException {
-
+        if (gui != null) {
+            gui.close();
+        }
     }
 
     @Override
@@ -62,7 +90,7 @@ public class Playground extends Script {
             else
             {
                 log("Fight a Goblin");
-                fightNPC("Chicken");
+                fightNPC(enemy);
             }
         }
 
@@ -75,7 +103,9 @@ public class Playground extends Script {
 
        if(inv.contains("Bones")){
            if(inv.getItem("Bones").interact("Bury")){
-               new ConditionalSleep(30000, 1000)
+
+               //TODO: Improve the speed on this
+               new ConditionalSleep(45000, 1000)
                {
                    @Override
                    public boolean condition() throws InterruptedException {
@@ -107,7 +137,13 @@ public class Playground extends Script {
 
         //gets the nearest opponent worthy of combat! Note: Worthy opponent is defined above
         //Warning might be null! Maybe. Just Maybe.
-        return getNpcs().closest(worthyOpponentFilter);
+       NPC worthyOpponent = getNpcs().closest(worthyOpponentFilter);
+
+       if(worthyOpponent == null){
+           log("Uh oh... NPC is null");
+       }
+
+       return worthyOpponent;
 
     }
 
@@ -118,26 +154,31 @@ public class Playground extends Script {
             NPC npc = getWorthyOpponent(NPC_name);
 
             //pan to the npc if it is not visible
-            if (!npc.isVisible()) {
-                getCamera().toEntity(npc);
-            }
+            if (npc != null) {
+                if (!npc.isVisible()) {
+                    getCamera().toEntity(npc);
+                }
 
-            //if npc is too far away to interact with safely
-            if (npc.getPosition().distance(myPosition()) < 7)
-            {
-                if(npc.interact()){
-                    new ConditionalSleep(3000, 1000) {
-                        @Override
-                        public boolean condition() throws InterruptedException {
-                            return getCombat().isFighting();
-                        }
-                    }.sleep();
+                //if npc is too far away to interact with safely
+                if (npc.getPosition().distance(myPosition()) < 7) {
+                    if (npc.interact()) {
+                        new ConditionalSleep(3000, 1000) {
+                            @Override
+                            public boolean condition() throws InterruptedException {
+                                return getCombat().isFighting();
+                            }
+                        }.sleep();
 
+                    }
+                }
+                //get closer to the npc
+                else {
+                    travelToEntity(npc);
                 }
             }
-            //get closer to the npc
-            else {
-                travelToEntity(npc);
+            else
+            {
+                log("How can I fight this npc, it is null!");
             }
         }
     }
