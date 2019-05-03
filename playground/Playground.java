@@ -1,8 +1,6 @@
 package playground;
 
-import org.osbot.rs07.api.Combat;
-import org.osbot.rs07.api.GroundItems;
-import org.osbot.rs07.api.Settings;
+import org.osbot.rs07.api.Inventory;
 import org.osbot.rs07.api.filter.Filter;
 import org.osbot.rs07.api.model.Entity;
 import org.osbot.rs07.api.model.GroundItem;
@@ -12,21 +10,13 @@ import org.osbot.rs07.script.ScriptManifest;
 import org.osbot.rs07.utility.ConditionalSleep;
 
 import java.awt.*;
-import java.util.Random;
 
 @ScriptManifest(author = "EsotericRS", info = "", logo = "", name = "Playground Script", version = 0.1)
 public class Playground extends Script {
-    enum States { SEARCHING_FOR_NPC, MOVING_TO_NPC, FIGHTING_NPC, LOOTING, IDLE, TRAVELING }
-
-    private States state;
-    private String ground_items[];
-
-
 
     @Override
     //Executes once on script start
     public void onStart() throws InterruptedException {
-
     }
 
     @Override
@@ -38,37 +28,56 @@ public class Playground extends Script {
     @Override
     //Executes every 600 milliseconds
     public int onLoop() throws InterruptedException {
+        /*
+        Pseudocode:
+        if not in combat and not moving:
+            if my inventory is full:
+                bury the bones
+            else if there are bones on the ground:
+                pick them up
+            else:
+                fight an NPC
+        */
 
-        //run when atleast 75 energy is replenished
-        handleRunning(75);
+        GroundItem ground_bones = getGroundItems().closest(gi -> gi != null && gi.getName().equals("Bones") && getMap().canReach(gi));
+        boolean pickable_bones = ground_bones != null;
 
-        //fight chickens!
-        fightNPC("Chicken");
-
-        if(state == States.FIGHTING_NPC)
+        //if not in combat and not moving -> do something
+        if(!getCombat().isFighting() && !myPlayer().isMoving())
         {
-            state = getCombat().isFighting() ? States.FIGHTING_NPC : States.IDLE;
+            //if my inventory is full -> bury the bones
+            if(getInventory().isFull())
+            {
+                bury_bones();
+            }
+            //else if there are bones on the ground -> pick them up
+            else if(pickable_bones)
+            {
+                pickUp("Bones");
+            }
+            //else fight an NPC
+            else
+            {
+                fightNPC("Goblin");
+            }
         }
-
-        if(!getCombat().isFighting() && !myPlayer().isMoving()) {
-            checkGroundItems("Bones");
-        }
-
-
-
-
-
-
 
         //This is the tick rate the script will poll this onLoop() method at
-        //Tick rate is randomized to decrease predictability over time
-        return (600 + (int) (Math.random() * (1200 - 600)));
+        return (400);
+    }
+
+    private void bury_bones() {
+        Inventory inv = getInventory();
+       if(inv.contains("Bones")){
+           if(inv.getItem("Bones").interact("Bones"));
+       }
+       else {
+           inv.deselectItem();
+       }
     }
 
     //returns an opponent worthy of our combat
     private NPC getWorthyOpponent(String name){
-
-        state = States.SEARCHING_FOR_NPC;
 
         //This filter will matches with an npc that is reachable, has name = name, has > 0 hp, is not currently
         // being interacted with already, and still exists
@@ -89,7 +98,7 @@ public class Playground extends Script {
     }
 
     //engages in combat with the most worthy opponent with name NPC_name.
-    public void fightNPC(String NPC_name){
+    private void fightNPC(String NPC_name){
         //if im not in the middle of something...
         if(!getCombat().isFighting() && !myPlayer().isMoving()) {
             NPC npc = getWorthyOpponent(NPC_name);
@@ -102,17 +111,11 @@ public class Playground extends Script {
             //if npc is too far away to interact with safely
             if (npc.getPosition().distance(myPosition()) < 7)
             {
-                state = States.MOVING_TO_NPC;
                 if(npc.interact()){
                     new ConditionalSleep(3000, 1000) {
                         @Override
                         public boolean condition() throws InterruptedException {
-                            boolean is_fighting = getCombat().isFighting();
-                            if(is_fighting)
-                            {
-                                state=States.FIGHTING_NPC;
-                            }
-                            return is_fighting;
+                            return getCombat().isFighting();
                         }
                     }.sleep();
 
@@ -125,20 +128,14 @@ public class Playground extends Script {
         }
     }
 
-    public void travelToEntity(Entity entity)
+    private void travelToEntity(Entity entity)
     {
-
-        state = States.TRAVELING;
         //Getting within 4 tiles of an entity -- pretty close for safe interactions
         if(getWalking().walk(entity)){
             new ConditionalSleep(12000, 6000) {
                 @Override
                 public boolean condition() throws InterruptedException {
-                    boolean closeEnough = entity.getPosition().distance(myPosition()) < 4;
-                    if(closeEnough){
-                        state = States.IDLE;
-                    }
-                    return closeEnough;
+                    return entity.getPosition().distance(myPosition()) < 4;
                 }
             }.sleep();
     }
@@ -158,7 +155,7 @@ public class Playground extends Script {
         }
     }
 
-    private void checkGroundItems(String ground_item)
+    private void pickUp(String ground_item)
     {
         GroundItem ground_bones = getGroundItems().closest(gi -> gi != null && gi.getName().equals(ground_item) && getMap().canReach(gi));
         if (ground_bones != null) //if it exists
@@ -177,11 +174,12 @@ public class Playground extends Script {
                     }.sleep();
                 }
             }
+            else
+            {
+                travelToEntity(ground_bones);
+            }
         }
-        else
-        {
-            travelToEntity(ground_bones);
-        }
+
 
     }
 
