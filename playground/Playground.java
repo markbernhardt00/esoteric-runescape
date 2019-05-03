@@ -1,8 +1,11 @@
 package playground;
 
 import org.osbot.rs07.api.Combat;
+import org.osbot.rs07.api.GroundItems;
 import org.osbot.rs07.api.Settings;
 import org.osbot.rs07.api.filter.Filter;
+import org.osbot.rs07.api.model.Entity;
+import org.osbot.rs07.api.model.GroundItem;
 import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.script.Script;
 import org.osbot.rs07.script.ScriptManifest;
@@ -12,7 +15,13 @@ import java.awt.*;
 import java.util.Random;
 
 @ScriptManifest(author = "EsotericRS", info = "", logo = "", name = "Playground Script", version = 0.1)
-public class Main extends Script {
+public class Playground extends Script {
+    enum States { SEARCHING_FOR_NPC, MOVING_TO_NPC, FIGHTING_NPC, LOOTING, IDLE, TRAVELING }
+
+    private States state;
+    private String ground_items[];
+
+
 
     @Override
     //Executes once on script start
@@ -36,6 +45,14 @@ public class Main extends Script {
         //fight chickens!
         fightNPC("Chicken");
 
+        if(state == States.FIGHTING_NPC)
+        {
+            state = getCombat().isFighting() ? States.FIGHTING_NPC : States.IDLE;
+        }
+
+        if(!getCombat().isFighting() && !myPlayer().isMoving()) {
+            checkGroundItems("Bones");
+        }
 
 
 
@@ -50,6 +67,8 @@ public class Main extends Script {
 
     //returns an opponent worthy of our combat
     private NPC getWorthyOpponent(String name){
+
+        state = States.SEARCHING_FOR_NPC;
 
         //This filter will matches with an npc that is reachable, has name = name, has > 0 hp, is not currently
         // being interacted with already, and still exists
@@ -69,29 +88,63 @@ public class Main extends Script {
 
     }
 
+    //engages in combat with the most worthy opponent with name NPC_name.
     public void fightNPC(String NPC_name){
         //if im not in the middle of something...
         if(!getCombat().isFighting() && !myPlayer().isMoving()) {
             NPC npc = getWorthyOpponent(NPC_name);
 
-            //if npc is visible... attack it
-            if (npc.isVisible()) {
+            //pan to the npc if it is not visible
+            if (!npc.isVisible()) {
+                getCamera().toEntity(npc);
+            }
+
+            //if npc is too far away to interact with safely
+            if (npc.getPosition().distance(myPosition()) < 7)
+            {
+                state = States.MOVING_TO_NPC;
                 if(npc.interact()){
                     new ConditionalSleep(3000, 1000) {
                         @Override
                         public boolean condition() throws InterruptedException {
-                            return getCombat().isFighting();
+                            boolean is_fighting = getCombat().isFighting();
+                            if(is_fighting)
+                            {
+                                state=States.FIGHTING_NPC;
+                            }
+                            return is_fighting;
                         }
                     }.sleep();
+
                 }
             }
-            //else pan to the npc so that it is visible
-            else
-            {
-                getCamera().toEntity(npc);
+            //get closer to the npc
+            else {
+                travelToEntity(npc);
             }
-
         }
+    }
+
+    public void travelToEntity(Entity entity)
+    {
+
+        state = States.TRAVELING;
+        //Getting within 4 tiles of an entity -- pretty close for safe interactions
+        if(getWalking().walk(entity)){
+            new ConditionalSleep(12000, 6000) {
+                @Override
+                public boolean condition() throws InterruptedException {
+                    boolean closeEnough = entity.getPosition().distance(myPosition()) < 4;
+                    if(closeEnough){
+                        state = States.IDLE;
+                    }
+                    return closeEnough;
+                }
+            }.sleep();
+    }
+
+
+
     }
 
     private void handleRunning(int min_energy)
@@ -103,6 +156,33 @@ public class Main extends Script {
                 settings.setRunning(true);
             }
         }
+    }
+
+    private void checkGroundItems(String ground_item)
+    {
+        GroundItem ground_bones = getGroundItems().closest(gi -> gi != null && gi.getName().equals(ground_item) && getMap().canReach(gi));
+        if (ground_bones != null) //if it exists
+        {
+            boolean closeEnough = ground_bones.getPosition().distance(myPosition()) < 7;
+            if (closeEnough) {
+
+
+                int lastCount = getInventory().getEmptySlotCount();
+                if (ground_bones.interact("Take")) {
+                    new ConditionalSleep(3000, 1000) {
+                        @Override
+                        public boolean condition() throws InterruptedException {
+                            return getInventory().getEmptySlotCount() < lastCount;
+                        }
+                    }.sleep();
+                }
+            }
+        }
+        else
+        {
+            travelToEntity(ground_bones);
+        }
+
     }
 
     @Override
