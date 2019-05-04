@@ -2,6 +2,8 @@ package playground;
 
 import org.osbot.rs07.api.Inventory;
 import org.osbot.rs07.api.filter.Filter;
+import org.osbot.rs07.api.map.Area;
+import org.osbot.rs07.api.map.Position;
 import org.osbot.rs07.api.model.Entity;
 import org.osbot.rs07.api.model.GroundItem;
 import org.osbot.rs07.api.model.NPC;
@@ -19,8 +21,19 @@ public class Playground extends Script {
 
     private GUI gui = new GUI();
     private Boolean visit_bank;
-    private Boolean pick_up_bones;
+    private Boolean bury_bones;
     private String food;
+
+    private static final Position[] COWS_POSITION_ARRAY =
+            { new Position(3264, 3297, 0),
+            new Position(3265, 3255, 0),
+            new Position(3253, 3255, 0),
+            new Position(3253, 3271, 0),
+            new Position(3251,3275,0),
+            new Position(3241,3285,0),
+            new Position(3244,3290,0),
+            new Position(3241,3297,0) };
+    private static final Area COWS_AREA = new Area(COWS_POSITION_ARRAY);
 
     @Override
     //Executes once on script start
@@ -41,7 +54,7 @@ public class Playground extends Script {
         }
 
         visit_bank = gui.getIsBankChecked();
-        pick_up_bones = gui.getIsBonesChecked();
+        bury_bones = gui.getIsBonesChecked();
     }
 
     //JIC user closes the dialog and doesn't click the start button
@@ -61,11 +74,13 @@ public class Playground extends Script {
         /*
         Pseudocode:
         if hp < 100:
-            eat food
+            eat
         if not in combat and not moving:
-            if my inventory is full:
-                bury the pick_up_bones
-            else if there are pick_up_bones on the ground:
+            if not in the cow area:
+                go to the cow area
+            else if my inventory is full:
+                bury the bones
+            else if there are bury_bones on the ground:
                 pick them up
             else:
                 fight an NPC
@@ -78,15 +93,19 @@ public class Playground extends Script {
         //if not in combat and not moving -> do something
         if(!getCombat().isFighting() && !myPlayer().isMoving() && !myPlayer().isUnderAttack())
         {
-            log("I am not fighting... nor am I moving so I will: ");
-            //if my inventory is full -> bury the pick_up_bones
-            if(getInventory().isFull())
+            if(!COWS_AREA.contains(myPosition()))
             {
-                log("Bury pick_up_bones because my inventory is full");
+                log("Not in cow area, web-walking to cow area");
+                walkToCowArea();
+            }
+            //if my inventory is full -> bury the bury_bones
+            else if(getInventory().isFull() &&  bury_bones)
+            {
+                log("Bury bones because my inventory is full");
                 bury_bones();
             }
-            //else if there are pick_up_bones on the ground -> pick them up
-            else if(checkForBones() != null && pick_up_bones)
+            //else if there are bones on the ground -> pick them up
+            else if(checkForBones() != null && bury_bones)
             {
                 log("Pick up some available bones");
                 pickUp("Bones");
@@ -123,6 +142,18 @@ public class Playground extends Script {
        else {
            inv.deselectItem();
        }
+    }
+
+    private void walkToCowArea()
+    {
+        if(getWalking().webWalk(COWS_AREA.getRandomPosition())){
+            new ConditionalSleep(100000, 10000) {
+                @Override
+                public boolean condition() throws InterruptedException {
+                    return COWS_AREA.contains(myPosition());
+                }
+            }.sleep();
+        }
     }
 
     //returns an opponent worthy of our combat
