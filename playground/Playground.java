@@ -16,15 +16,20 @@ import java.lang.reflect.InvocationTargetException;
 
 import java.awt.*;
 
+//TODO: If not enough food, visit bank and get food
+// TODO: Areas for Chickens, Goblins
+// TODO: Possibly Combat Stance Switch?
+// TODO: Visit different areas depending on combat level i.e. chickens until 10, goblins until 20, cows until 30...
+// TODO: Badly needs seperation of Concerns
+
 @ScriptManifest(author = "EsotericRS", info = "", logo = "", name = "Playground Script", version = 0.1)
 public class Playground extends Script {
 
     private GUI gui = new GUI();
-    private Boolean visit_bank;
     private Boolean bury_bones;
     private String food;
 
-    private static final Position[] COWS_POSITION_ARRAY =
+    private static final Position[] COW_PEN_POSITION_ARRAY_1 =
             { new Position(3264, 3297, 0),
             new Position(3265, 3255, 0),
             new Position(3253, 3255, 0),
@@ -33,7 +38,29 @@ public class Playground extends Script {
             new Position(3241,3285,0),
             new Position(3244,3290,0),
             new Position(3241,3297,0) };
-    private static final Area COWS_AREA = new Area(COWS_POSITION_ARRAY);
+    private static final Area COW_AREA_1 = new Area(COW_PEN_POSITION_ARRAY_1);
+
+    private static final Position[] COW_PEN_POSITION_ARRAY_2 =
+            { new Position(3264, 3297, 0),
+                    new Position(3194, 3287, 0),
+                    new Position(3211, 3286, 0),
+                    new Position(3208, 3300, 0),
+                    new Position(3195,3301,0) };
+    private static final Area COW_AREA_2 = new Area(COW_PEN_POSITION_ARRAY_2);
+
+    private static final Position[] CHICKEN_COOP_POSITION_ARRAY_2 = { new Position(3183, 3292, 0),
+            new Position(3183,3301,0),
+            new Position(3171,3300,0),
+            new Position(3171, 3290, 0) };
+
+    private static final Area CHICKEN_COOP_AREA_2 = new Area(CHICKEN_COOP_POSITION_ARRAY_2);
+
+    private static final Position[] GOBLIN_SPIDER_POSITION_ARRAY = { new Position(3255, 3239, 0),
+            new Position(3244,3241,0),
+            new Position(3248,3230,0),
+            new Position(3263, 3220, 0) };
+
+    private static final Area GOBLIN_SPIDER_ARRAY = new Area(GOBLIN_SPIDER_POSITION_ARRAY);
 
     @Override
     //Executes once on script start
@@ -53,7 +80,6 @@ public class Playground extends Script {
             return;
         }
 
-        visit_bank = gui.getIsBankChecked();
         bury_bones = gui.getIsBonesChecked();
     }
 
@@ -76,15 +102,17 @@ public class Playground extends Script {
         if hp < 100:
             eat
         if not in combat and not moving:
-            if not in the cow area:
-                go to the cow area
+            if not in the task rea:
+                go to the task area
             else if my inventory is full:
                 bury the bones
-            else if there are bury_bones on the ground:
+            else if there are buryBones on the ground:
                 pick them up
             else:
                 fight an NPC
         */
+
+        handleEnergy();
 
         if(myPlayer().getHealthPercent() < 50)
         {
@@ -93,36 +121,44 @@ public class Playground extends Script {
         //if not in combat and not moving -> do something
         if(!getCombat().isFighting() && !myPlayer().isMoving() && !myPlayer().isUnderAttack())
         {
-            if(!COWS_AREA.contains(myPosition()))
+            //if player is not in cow area
+            if(!CHICKEN_COOP_AREA_2.contains(myPosition()))
             {
                 log("Not in cow area, web-walking to cow area");
-                walkToCowArea();
+                webWalkToArea(CHICKEN_COOP_AREA_2);
             }
-            //if my inventory is full -> bury the bury_bones
+            //if my inventory is full -> bury the buryBones if that option was selected
             else if(getInventory().isFull() &&  bury_bones)
             {
                 log("Bury bones because my inventory is full");
-                bury_bones();
+                buryBones();
             }
-            //else if there are bones on the ground -> pick them up
+            //else if i am burying bones check for/pick up some bones to bury
             else if(checkForBones() != null && bury_bones)
             {
                 log("Pick up some available bones");
                 pickUp("Bones");
             }
-            //else fight an NPC
+            //Nothing else on the agenda, so time to fight
             else
             {
                 log("Fight a Cow");
-                fightNPC("Cow");
+                fightNPC("Chicken");
             }
         }
 
-        //This is the tick rate the script will poll this onLoop() method at
+        //High tick-rate, probably too high, we'll see
         return (2400);
     }
 
-    private void bury_bones() {
+    //Toggles 'Run' in player settings if they have more than 65 energy
+    public void handleEnergy(){
+        if (getSettings().getRunEnergy() > 65)
+            getSettings().setRunning(true);
+    }
+
+    //Bury all the bones in the players inventory
+    private void buryBones() {
         Inventory inv = getInventory();
 
        if(inv.contains("Bones")){
@@ -144,19 +180,17 @@ public class Playground extends Script {
        }
     }
 
-    private void walkToCowArea()
+    //Walk to the cow pen near lumbridge
+    private void webWalkToArea(Area area)
     {
-        if(getWalking().webWalk(COWS_AREA.getRandomPosition())){
-            new ConditionalSleep(100000, 10000) {
-                @Override
-                public boolean condition() throws InterruptedException {
-                    return COWS_AREA.contains(myPosition());
-                }
-            }.sleep();
-        }
+        getWalking().webWalk(area);
     }
 
-    //returns an opponent worthy of our combat
+    /*
+    This method will return 'problem-free' NPC with getName() = name or if none are available it will return NPC == null (bad-btw)
+    NOTE: Worthy defined as existing, reachable, has name = name, is not in dying state (0% hp),
+    and not interacted with by somebody else.
+    */
     private NPC getWorthyOpponent(String name){
 
         //This filter will matches with an npc that is reachable, has name = name, has > 0 hp, is not currently
@@ -246,6 +280,7 @@ public class Playground extends Script {
         }
     }
 
+    //Web walks to entity.getPosition
     private void travelToEntity(Entity entity)
     {
         //Getting within 4 tiles of an entity -- pretty close for safe interactions
@@ -259,21 +294,15 @@ public class Playground extends Script {
         }
     }
 
+    //Returns The closest GroundItem with getName("Bones) or if none are available it will return GroundItem == null
     private GroundItem checkForBones(){
         return getGroundItems().closest(gi -> gi != null && gi.getName().equals("Bones") && gi.getPosition().distance(myPosition()) < 7);
     }
 
-    private void handleRunning(int min_energy)
-    {
-        //A simple way to enable manage run energy
-        //If were not running and have more than 75 run energy, RUN.
-        if(!settings.isRunning()) {
-            if (settings.getRunEnergy() > min_energy) {
-                settings.setRunning(true);
-            }
-        }
-    }
-
+    /*
+    This will pick up the closest ground_item with .getName(ground_item),
+    It will web-walk to the item and pan the camera if necessary
+    */
     private void pickUp(String ground_item)
     {
         GroundItem item = getGroundItems().closest(gi -> gi != null && gi.getName().equals(ground_item) && getMap().canReach(gi));

@@ -8,7 +8,6 @@ import java.util.HashMap;
 
 public class GUI {
     private final JDialog mainDialog;
-    private final JCheckBox bankCB;
     private final JCheckBox bonesCB;
 
     private boolean started;
@@ -24,24 +23,15 @@ public class GUI {
         mainPanel.setBorder(new EmptyBorder(20,20,20,20));
         mainDialog.getContentPane().add(mainPanel);
 
-        JPanel bankChoosePanel = new JPanel();
-        bankChoosePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
         JPanel bonesChoosePanel = new JPanel();
         bonesChoosePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        JLabel bankChooseLabel = new JLabel("Bank items?");
-        bankChoosePanel.add(bankChooseLabel);
-
-        bankCB = new JCheckBox();
-        bankChoosePanel.add(bankCB);
 
         bonesCB = new JCheckBox();
-        bankChoosePanel.add(bonesCB);
+        bonesChoosePanel.add(bonesCB);
         JLabel bonesChooseLabel = new JLabel("Bury Bones? (Warning: Lots of bones)");
         bonesChoosePanel.add(bonesChooseLabel);
 
-        mainPanel.add(bankChoosePanel);
         mainPanel.add(bonesChoosePanel);
 
         JButton startButton = new JButton("Start");
@@ -56,10 +46,6 @@ public class GUI {
 
     public boolean isStarted() {
         return started;
-    }
-
-    public Boolean getIsBankChecked(){
-        return bankCB.isSelected();
     }
 
     public Boolean getIsBonesChecked(){
