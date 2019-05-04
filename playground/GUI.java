@@ -3,17 +3,17 @@ package playground;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class GUI {
     private final JDialog mainDialog;
-    private final JComboBox<String> enemySelector;
+    private final JCheckBox bankCB;
+    private final JCheckBox bonesCB;
 
     private boolean started;
 
     public GUI() {
-
-        String[] enemies = { "Cow", "Chicken", "Goblin", "Man" };
-
         mainDialog = new JDialog();
         mainDialog.setTitle("EsotericRS Playground");
         mainDialog.setModal(true);
@@ -24,16 +24,25 @@ public class GUI {
         mainPanel.setBorder(new EmptyBorder(20,20,20,20));
         mainDialog.getContentPane().add(mainPanel);
 
-        JPanel enemySelectionPanel = new JPanel();
-        enemySelectionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JPanel bankChoosePanel = new JPanel();
+        bankChoosePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        JLabel enemySelectionLabel = new JLabel("Select an enemy: ");
-        enemySelectionPanel.add(enemySelectionLabel);
+        JPanel bonesChoosePanel = new JPanel();
+        bonesChoosePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        enemySelector = new JComboBox<>(enemies);
-        enemySelectionPanel.add(enemySelector);
+        JLabel bankChooseLabel = new JLabel("Bank items?");
+        bankChoosePanel.add(bankChooseLabel);
 
-        mainPanel.add(enemySelectionPanel);
+        bankCB = new JCheckBox();
+        bankChoosePanel.add(bankCB);
+
+        bonesCB = new JCheckBox();
+        bankChoosePanel.add(bonesCB);
+        JLabel bonesChooseLabel = new JLabel("Bury Bones? (Warning: Lots of bones)");
+        bonesChoosePanel.add(bonesChooseLabel);
+
+        mainPanel.add(bankChoosePanel);
+        mainPanel.add(bonesChoosePanel);
 
         JButton startButton = new JButton("Start");
         startButton.addActionListener(e -> {
@@ -49,8 +58,12 @@ public class GUI {
         return started;
     }
 
-    public String getSelectedEnemy(){
-        return enemySelector.getSelectedItem().toString();
+    public Boolean getIsBankChecked(){
+        return bankCB.isSelected();
+    }
+
+    public Boolean getIsBonesChecked(){
+        return bonesCB.isSelected();
     }
 
     public void open(){

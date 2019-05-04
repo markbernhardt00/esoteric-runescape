@@ -9,7 +9,6 @@ import org.osbot.rs07.script.Script;
 import org.osbot.rs07.script.ScriptManifest;
 import org.osbot.rs07.utility.ConditionalSleep;
 import javax.swing.*;
-import playground.GUI;
 import java.lang.reflect.InvocationTargetException;
 
 
@@ -19,7 +18,9 @@ import java.awt.*;
 public class Playground extends Script {
 
     private GUI gui = new GUI();
-    private String enemy;
+    private Boolean visit_bank;
+    private Boolean pick_up_bones;
+    private String food;
 
     @Override
     //Executes once on script start
@@ -39,7 +40,8 @@ public class Playground extends Script {
             return;
         }
 
-        enemy = gui.getSelectedEnemy();
+        visit_bank = gui.getIsBankChecked();
+        pick_up_bones = gui.getIsBonesChecked();
     }
 
     //JIC user closes the dialog and doesn't click the start button
@@ -58,30 +60,33 @@ public class Playground extends Script {
     public int onLoop() throws InterruptedException {
         /*
         Pseudocode:
+        if hp < 100:
+            eat food
         if not in combat and not moving:
             if my inventory is full:
-                bury the bones
-            else if there are bones on the ground:
+                bury the pick_up_bones
+            else if there are pick_up_bones on the ground:
                 pick them up
             else:
                 fight an NPC
         */
 
-        GroundItem ground_bones = getGroundItems().closest(gi -> gi != null && gi.getName().equals("Bones") && gi.getPosition().distance(myPosition()) < 7);
-        boolean pickable_bones = ground_bones != null;
-
+        if(myPlayer().getHealthPercent() < 50)
+        {
+            eatFood("Lobster");
+        }
         //if not in combat and not moving -> do something
-        if(!getCombat().isFighting() && !myPlayer().isMoving())
+        if(!getCombat().isFighting() && !myPlayer().isMoving() && !myPlayer().isUnderAttack())
         {
             log("I am not fighting... nor am I moving so I will: ");
-            //if my inventory is full -> bury the bones
+            //if my inventory is full -> bury the pick_up_bones
             if(getInventory().isFull())
             {
-                log("Bury bones because my inventory is full");
+                log("Bury pick_up_bones because my inventory is full");
                 bury_bones();
             }
-            //else if there are bones on the ground -> pick them up
-            else if(pickable_bones)
+            //else if there are pick_up_bones on the ground -> pick them up
+            else if(checkForBones() != null && pick_up_bones)
             {
                 log("Pick up some available bones");
                 pickUp("Bones");
@@ -89,13 +94,13 @@ public class Playground extends Script {
             //else fight an NPC
             else
             {
-                log("Fight a Goblin");
-                fightNPC(enemy);
+                log("Fight a Cow");
+                fightNPC("Cow");
             }
         }
 
         //This is the tick rate the script will poll this onLoop() method at
-        return (400);
+        return (2400);
     }
 
     private void bury_bones() {
@@ -147,6 +152,33 @@ public class Playground extends Script {
 
     }
 
+    private void eatFood(String food_name)
+    {
+        Inventory inv = getInventory();
+
+        int before_eating_count = inv.getCapacity();
+
+
+        if(inv.contains(food_name)){
+
+
+            if(inv.getItem(food_name).interact("Eat")){
+
+                new ConditionalSleep(3000, 1000)
+                {
+
+                    @Override
+                    public boolean condition() throws InterruptedException {
+                        return (getInventory().getCapacity() < before_eating_count ? true : false);
+                    }
+                }.sleep();
+            }
+        }
+        else {
+            inv.deselectItem();
+        }
+    }
+
     //engages in combat with the most worthy opponent with name NPC_name.
     private void fightNPC(String NPC_name){
         //if im not in the middle of something...
@@ -193,10 +225,11 @@ public class Playground extends Script {
                     return entity.getPosition().distance(myPosition()) < 7;
                 }
             }.sleep();
+        }
     }
 
-
-
+    private GroundItem checkForBones(){
+        return getGroundItems().closest(gi -> gi != null && gi.getName().equals("Bones") && gi.getPosition().distance(myPosition()) < 7);
     }
 
     private void handleRunning(int min_energy)
@@ -212,18 +245,18 @@ public class Playground extends Script {
 
     private void pickUp(String ground_item)
     {
-        GroundItem ground_bones = getGroundItems().closest(gi -> gi != null && gi.getName().equals(ground_item) && getMap().canReach(gi));
-        if (ground_bones != null) //if it exists
+        GroundItem item = getGroundItems().closest(gi -> gi != null && gi.getName().equals(ground_item) && getMap().canReach(gi));
+        if (item != null) //if it exists
         {
-            boolean closeEnough = ground_bones.getPosition().distance(myPosition()) < 7;
+            boolean closeEnough = item.getPosition().distance(myPosition()) < 7;
             if (closeEnough) {
-                if(!ground_bones.isVisible())
+                if(!item.isVisible())
                 {
                     log("I cant see the bones, so I am panning the camera");
-                    getCamera().toEntity(ground_bones);
+                    getCamera().toEntity(item);
                 }
                 int lastCount = getInventory().getEmptySlotCount();
-                if (ground_bones.interact("Take")) {
+                if (item.interact("Take")) {
                     new ConditionalSleep(3000, 1000) {
                         @Override
                         public boolean condition() throws InterruptedException {
@@ -234,8 +267,8 @@ public class Playground extends Script {
             }
             else
             {
-                log("Traveling to the bones");
-                travelToEntity(ground_bones);
+                log("Traveling to the item: " + item);
+                travelToEntity(item);
             }
         }
 
