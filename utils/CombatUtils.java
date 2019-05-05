@@ -2,22 +2,24 @@ package utils;
 
 import org.osbot.rs07.api.filter.Filter;
 import org.osbot.rs07.api.model.NPC;
+import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.script.MethodProvider;
 import org.osbot.rs07.utility.ConditionalSleep;
 
 public final class CombatUtils {
 
-    private CombatUtils(){}
+    private CombatUtils() {
+    }
 
     /*
     This method will return 'problem-free' NPC with getName() = name or if none are available it will return NPC == null (bad-btw)
     NOTE: Worthy defined as existing, reachable, has name = name, is not in dying state (0% hp),
     and not interacted with by somebody else.
     */
-    public static NPC getWorthyOpponent(MethodProvider api, String name){
+    public static NPC getWorthyOpponent(MethodProvider api, String name) {
         //This filter will matches with an npc that is reachable, has name = name, has > 0 hp, is not currently
         // being interacted with already, and still exists
-        Filter worthyOpponentFilter = new Filter<NPC>(){
+        Filter worthyOpponentFilter = new Filter<NPC>() {
             @Override
             public boolean match(NPC npc) {
                 return npc != null && api.getMap().canReach(npc) &&
@@ -31,16 +33,16 @@ public final class CombatUtils {
         //Warning might be null! Maybe. Just Maybe.
         NPC worthyOpponent = api.getNpcs().closest(worthyOpponentFilter);
 
-        if(worthyOpponent == null){
+        if (worthyOpponent == null) {
             api.log("Uh oh... NPC is null");
         }
 
         return worthyOpponent;
     }
 
-    public static void fightNPC(MethodProvider api, String NPC_name){
+    public static void fightNPC(MethodProvider api, String NPC_name) {
         //if im not in the middle of something...
-        if(!api.getCombat().isFighting() && !api.myPlayer().isMoving()) {
+        if (!api.getCombat().isFighting() && !api.myPlayer().isMoving()) {
             NPC npc = getWorthyOpponent(api, NPC_name);
 
             //pan to the npc if it is not visible
@@ -63,13 +65,22 @@ public final class CombatUtils {
                 }
                 //web-walk to the npc
                 else {
-                   api.getWalking().webWalk(npc.getPosition());
+                    api.getWalking().webWalk(npc.getPosition());
                 }
-            }
-            else
-            {
+            } else {
                 api.log("How can I fight this npc, it is null!");
             }
+        }
+    }
+
+    //This method will change styles to balance a characters levels up to the given int
+    public static void handleStyleChange(MethodProvider api, int level) {
+        if (api.getConfigs().get(43) != 0 && api.getSkills().getStatic(Skill.ATTACK) < level) {
+            utils.WidgetUtils.changeCombatStyle(api, "Stab");
+        } else if ((api.getConfigs().get(43) == 0 || api.getConfigs().get(43) == 3) && api.getSkills().getStatic(Skill.ATTACK) >= level && api.getSkills().getStatic(Skill.STRENGTH) < level) {
+            utils.WidgetUtils.changeCombatStyle(api, "Slash");
+        } else if ((api.getConfigs().get(43) == 1 || api.getConfigs().get(43) == 2 || api.getConfigs().get(43) == 0) && api.getSkills().getStatic(Skill.STRENGTH) >= level && api.getSkills().getStatic(Skill.ATTACK) >= level && api.getSkills().getStatic(Skill.DEFENCE) < level) {
+            utils.WidgetUtils.changeCombatStyle(api, "Block");
         }
     }
 }
