@@ -42,8 +42,7 @@ public final class CombatUtils {
 
     public static NPC fightNPC(MethodProvider api, String NPC_name) {
         //if im not in the middle of something...
-
-        if (!api.getCombat().isFighting() && !api.myPlayer().isMoving()) {
+        if (!api.getCombat().isFighting() && !api.myPlayer().isMoving() && !api.myPlayer().isUnderAttack()) {
             NPC npc = getWorthyOpponent(api, NPC_name);
             //pan to the npc if it is not visible
             if (npc != null) {
@@ -53,7 +52,7 @@ public final class CombatUtils {
 
                 //if npc is too far away to interact with safely
                 if (npc.getPosition().distance(api.myPosition()) < 7) {
-                    if (npc.interact()) {
+                    if (npc.interact("Attack")) {
                         new ConditionalSleep(3000, 1000) {
                             @Override
                             public boolean condition() throws InterruptedException {

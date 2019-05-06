@@ -14,11 +14,18 @@ public class Level1Through10 extends Task {
     }
 
     @Override
-    //Attack, Defence, or Strength < 10 means they should be fighting chickens
+    /*
+    Pseudocode:
+    if have_enough_food:
+        if im below level 10 in any combat skill:
+            if im not moving or in a fight
+                I should be fighting chickens
+    */
     public boolean canProcess() {
+        boolean out_of_food = (utils.InventoryUtils.countInventoryItems(api, new String[]{"Cooked meat", "Cooked chicken"}) == 0);
         boolean not_busy = !api.myPlayer().isMoving() && !api.getCombat().isFighting();
         boolean inside_skill_range = (api.getSkills().getStatic(Skill.ATTACK) < 10 || api.getSkills().getStatic(Skill.STRENGTH) < 10 || api.getSkills().getStatic(Skill.DEFENCE) < 10);
-        return inside_skill_range && not_busy;
+        return inside_skill_range && not_busy && !out_of_food;
     }
 
     @Override
@@ -26,7 +33,6 @@ public class Level1Through10 extends Task {
 
         boolean in_chicken_coop_area_1 = CHICKEN_COOP_AREA_1.contains(api.myPosition());
         boolean in_chicken_coop_area_2 = CHICKEN_COOP_AREA_2.contains(api.myPosition());
-        boolean in_task_area = in_chicken_coop_area_1 || in_chicken_coop_area_2;
 
         if(in_chicken_coop_area_1) {
             utils.CombatUtils.fightNPC(api, "Chicken");
@@ -46,15 +52,15 @@ public class Level1Through10 extends Task {
     private void walkToRandomTaskArea(){
         int random_choice = utils.RandomUtils.random(1, 2);
         if(random_choice == 1) {
-            api.log("Walking to task area: CHICKEN_COOP_AREA_1");
+            api.log("[Levels1Through10] Walking to task area: CHICKEN_COOP_AREA_1");
             api.getWalking().webWalk(CHICKEN_COOP_AREA_1.getRandomPosition());
         }
         else{
-            api.log("Walking to task area: CHICKEN_COOP_AREA_2");
+            api.log("[Levels1Through10] Walking to task area: CHICKEN_COOP_AREA_2");
             api.getWalking().webWalk(CHICKEN_COOP_AREA_2.getRandomPosition());
         }
     }
-
+    //There are goblins that wander into this chicken coop... why not attack every once in awhile for some variety
     private void fightRandomChickenCoop2Enemy(){
         int rand_int = utils.RandomUtils.random(0, 4);
         if(rand_int < 4){
