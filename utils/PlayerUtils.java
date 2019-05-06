@@ -7,7 +7,9 @@ public final class PlayerUtils {
 
     //Toggles the players run energy when they have atleast 65 energy
     public static void handleEnergy(MethodProvider api){
-        if (api.getSettings().getRunEnergy() > 65)
+        if (api.getSettings().getRunEnergy() > 65 && !api.getSettings().isRunning()) {
+            api.log("Energy exceeded 65, toggling RUN to ACTIVE");
             api.getSettings().setRunning(true);
+        }
     }
 }

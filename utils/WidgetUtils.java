@@ -31,4 +31,14 @@ public final class WidgetUtils {
             combatStanceIcon.interact();
         }
     }
+
+    public static void keepInventoryOpen(MethodProvider api){
+        RS2Widget inventoryIcon = api.getWidgets().get(164,53);
+        RS2Widget fullInventoryView = api.getWidgets().get(164,66);
+        if(!fullInventoryView.isVisible() && fullInventoryView != null){
+            if(inventoryIcon != null){
+                inventoryIcon.interact();
+            }
+        }
+    }
 }

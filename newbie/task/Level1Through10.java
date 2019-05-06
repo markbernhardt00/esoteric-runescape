@@ -16,16 +16,23 @@ public class Level1Through10 extends Task {
     @Override
     //Attack, Defence, or Strength < 10 means they should be fighting chickens
     public boolean canProcess() {
+        boolean not_busy = !api.myPlayer().isMoving() && !api.getCombat().isFighting();
         boolean inside_skill_range = (api.getSkills().getStatic(Skill.ATTACK) < 10 || api.getSkills().getStatic(Skill.STRENGTH) < 10 || api.getSkills().getStatic(Skill.DEFENCE) < 10);
-        return inside_skill_range;
+        return inside_skill_range && not_busy;
     }
 
     @Override
     public void process() {
-        boolean in_task_area = CHICKEN_COOP_AREA_2.contains(api.myPosition()) || CHICKEN_COOP_AREA_1.contains(api.myPosition());
 
-        if(in_task_area) {
+        boolean in_chicken_coop_area_1 = CHICKEN_COOP_AREA_1.contains(api.myPosition());
+        boolean in_chicken_coop_area_2 = CHICKEN_COOP_AREA_2.contains(api.myPosition());
+        boolean in_task_area = in_chicken_coop_area_1 || in_chicken_coop_area_2;
+
+        if(in_chicken_coop_area_1) {
             utils.CombatUtils.fightNPC(api, "Chicken");
+        }
+        else if(in_chicken_coop_area_2){
+            fightRandomChickenCoop2Enemy();
         }
         else {
             walkToRandomTaskArea();
@@ -39,14 +46,24 @@ public class Level1Through10 extends Task {
     private void walkToRandomTaskArea(){
         int random_choice = utils.RandomUtils.random(1, 2);
         if(random_choice == 1) {
+            api.log("Walking to task area: CHICKEN_COOP_AREA_1");
             api.getWalking().webWalk(CHICKEN_COOP_AREA_1.getRandomPosition());
         }
         else{
+            api.log("Walking to task area: CHICKEN_COOP_AREA_2");
             api.getWalking().webWalk(CHICKEN_COOP_AREA_2.getRandomPosition());
         }
     }
 
-    //43:0 - stab 43:1 slash 43:3 block
+    private void fightRandomChickenCoop2Enemy(){
+        int rand_int = utils.RandomUtils.random(0, 4);
+        if(rand_int < 4){
+            utils.CombatUtils.fightNPC(api, "Chicken");
+        }
+        else{
+            utils.CombatUtils.fightNPC(api, "Goblin");
+        }
+    }
 
 
 

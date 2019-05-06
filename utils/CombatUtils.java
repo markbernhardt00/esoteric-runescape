@@ -40,11 +40,11 @@ public final class CombatUtils {
         return worthyOpponent;
     }
 
-    public static void fightNPC(MethodProvider api, String NPC_name) {
+    public static NPC fightNPC(MethodProvider api, String NPC_name) {
         //if im not in the middle of something...
+
         if (!api.getCombat().isFighting() && !api.myPlayer().isMoving()) {
             NPC npc = getWorthyOpponent(api, NPC_name);
-
             //pan to the npc if it is not visible
             if (npc != null) {
                 if (!npc.isVisible()) {
@@ -62,6 +62,7 @@ public final class CombatUtils {
                         }.sleep();
 
                     }
+                    api.log("Fighting with NPC: " + npc.getName());
                 }
                 //web-walk to the npc
                 else {
@@ -70,17 +71,23 @@ public final class CombatUtils {
             } else {
                 api.log("How can I fight this npc, it is null!");
             }
+            return npc;
         }
+        return null;
+
     }
 
     //This method will change styles to balance a characters levels up to the given int
     public static void handleStyleChange(MethodProvider api, int level) {
         if (api.getConfigs().get(43) != 0 && api.getSkills().getStatic(Skill.ATTACK) < level) {
+            api.log("Combat training milestone: Player is now attack skill level " + String.valueOf(level) + ". Switching to strength training...");
             utils.WidgetUtils.changeCombatStyle(api, "Stab");
         } else if ((api.getConfigs().get(43) == 0 || api.getConfigs().get(43) == 3) && api.getSkills().getStatic(Skill.ATTACK) >= level && api.getSkills().getStatic(Skill.STRENGTH) < level) {
+            api.log("Combat training milestone: Player is now strength skill level " + String.valueOf(level) + ". Switching to defence training...");
             utils.WidgetUtils.changeCombatStyle(api, "Slash");
         } else if ((api.getConfigs().get(43) == 1 || api.getConfigs().get(43) == 2 || api.getConfigs().get(43) == 0) && api.getSkills().getStatic(Skill.STRENGTH) >= level && api.getSkills().getStatic(Skill.ATTACK) >= level && api.getSkills().getStatic(Skill.DEFENCE) < level) {
             utils.WidgetUtils.changeCombatStyle(api, "Block");
+            api.log("Combat training milestone: Player is now defence skill level " + String.valueOf(level) + ". Moving to the next step in our progression.");
         }
     }
 }
