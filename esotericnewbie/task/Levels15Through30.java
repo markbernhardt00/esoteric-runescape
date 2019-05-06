@@ -1,4 +1,4 @@
-package newbie.task;
+package esotericnewbie.task;
 
 import org.osbot.rs07.api.map.Area;
 import org.osbot.rs07.api.ui.Skill;
@@ -32,7 +32,7 @@ public class Levels15Through30 extends Task{
     @Override
     public void process() {
 
-        utils.PlayerUtils.eatFood(api, new String[]{"Cooked meat", "Cooked chicken"}, 80);
+
         utils.PlayerUtils.handleEnergy(api);
         utils.CombatUtils.handleStyleChange(api, 30);
 

@@ -1,6 +1,5 @@
-package newbie.task;
+package esotericnewbie.task;
 
-import org.osbot.rs07.api.Bank;
 import org.osbot.rs07.api.map.constants.Banks;
 import org.osbot.rs07.api.model.RS2Object;
 import org.osbot.rs07.api.ui.EquipmentSlot;

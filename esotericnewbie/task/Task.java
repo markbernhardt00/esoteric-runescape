@@ -1,4 +1,4 @@
-package newbie.task;
+package esotericnewbie.task;
 
 import org.osbot.rs07.script.MethodProvider;
 
