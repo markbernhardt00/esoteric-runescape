@@ -14,13 +14,13 @@ public class Main extends Script {
     public void onStart(){
         utils.WidgetUtils.forceInventoryOpen(this);
 
+        tasks.add(new ManagePlayer(this));
         tasks.add(new FreshSpawn(this));
-        tasks.add(new Die(this));
-        tasks.add(new RecuperateHealth(this));
         tasks.add(new AquireFood(this));
         tasks.add(new Level1Through10(this));
         tasks.add(new Level10Through15(this));
         tasks.add(new Levels15Through30(this));
+        tasks.add(new Die(this));
     }
 
     @Override

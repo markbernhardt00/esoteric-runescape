@@ -29,8 +29,6 @@ public class Level1Through10 extends Task {
 
     /*
     Pseudocode:
-    if I have the energy and am not running: TODO: This should be handled elsewhere
-        toggle run
     if I'm ready for a stance switch:
         stance switch
     if im in chicken coop 1:
@@ -40,8 +38,6 @@ public class Level1Through10 extends Task {
     */
     @Override
     public void process() {
-
-        utils.PlayerUtils.handleEnergy(api);
         utils.CombatUtils.handleStyleChange(api, 10);
 
         boolean in_chicken_coop_area_1 = CHICKEN_COOP_AREA_1.contains(api.myPosition());

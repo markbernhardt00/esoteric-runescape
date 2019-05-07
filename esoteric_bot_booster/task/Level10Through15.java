@@ -34,8 +34,6 @@ public class Level10Through15 extends Task {
 
     /*
     Pseudocode:
-    if I have the energy and am not running: TODO: This should be handled elsewhere
-        toggle run
     if I'm ready for a stance switch:
         stance switch
     if im in a the goblin_spider area:
@@ -47,8 +45,6 @@ public class Level10Through15 extends Task {
     */
     @Override
     public void process() {
-
-        utils.PlayerUtils.handleEnergy(api);
         utils.CombatUtils.handleStyleChange(api, 15);
 
         Position my_pos = api.myPosition();

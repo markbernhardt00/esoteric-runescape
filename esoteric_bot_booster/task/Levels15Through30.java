@@ -33,8 +33,6 @@ public class Levels15Through30 extends Task{
 
     /*
     Pseudocode:
-    if I have the energy and am not running: TODO: This should be handled elsewhere
-        toggle run
     if I'm ready for a stance switch:
         stance switch
     if im in a cow area:
@@ -44,7 +42,6 @@ public class Levels15Through30 extends Task{
     */
     @Override
     public void process() {
-        utils.PlayerUtils.handleEnergy(api);
         utils.CombatUtils.handleStyleChange(api, 30);
 
         boolean in_task_area = COW_AREA_1.contains(api.myPosition()) || COW_AREA_2.contains(api.myPosition());
