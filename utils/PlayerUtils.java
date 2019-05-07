@@ -42,7 +42,7 @@ public final class PlayerUtils {
                     if (food_to_eat != null) {
                         api.log("Eating food named: " + food_name);
                         if (food_to_eat.interact("Eat")) {
-                            utils.Sleep.sleepUntil(() -> before_eating_capacity < api.getInventory().getCapacity(), 3000);
+                            SleepUtils.sleepUntil(() -> before_eating_capacity < api.getInventory().getCapacity(), 3000);
                         }
                     }
                 }

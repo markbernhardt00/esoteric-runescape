@@ -4,7 +4,7 @@ import org.osbot.rs07.api.map.constants.Banks;
 import org.osbot.rs07.api.model.RS2Object;
 import org.osbot.rs07.api.ui.EquipmentSlot;
 import org.osbot.rs07.script.MethodProvider;
-import utils.Sleep;
+import utils.SleepUtils;
 
 public class FreshSpawn extends Task{
 
@@ -40,14 +40,14 @@ public class FreshSpawn extends Task{
         if(api.getInventory().contains("Bronze sword")){
             api.log("Equipping a bronze sword");
             if(api.getEquipment().equip(EquipmentSlot.WEAPON, "Bronze sword")){
-                Sleep.sleepUntil(() -> api.getEquipment().contains("Bronze sword"), 5000);
+                SleepUtils.sleepUntil(() -> api.getEquipment().contains("Bronze sword"), 5000);
             }
             api.log("[FreshSpawn]: Equipped Bronze sword");
         }
 
         if(api.getInventory().contains("Wooden shield")){
             if(api.getEquipment().equip(EquipmentSlot.WEAPON, "Wooden shield")){
-                Sleep.sleepUntil(() -> api.getEquipment().contains("Wooden shield"), 5000);
+                SleepUtils.sleepUntil(() -> api.getEquipment().contains("Wooden shield"), 5000);
             }
             api.log("[FreshSpawn]: Equipped Wooden shield");
         }
@@ -62,7 +62,7 @@ public class FreshSpawn extends Task{
         RS2Object bank_booth = api.getObjects().closest(obj -> obj != null && obj.getName().equals("Bank booth") && api.getMap().canReach(obj));
         if(bank_booth != null){
             if(bank_booth.interact()){
-                utils.Sleep.sleepUntil(() -> api.getBank().isOpen(), 5000);
+                SleepUtils.sleepUntil(() -> api.getBank().isOpen(), 5000);
             }
             if(api.getBank().isOpen()){
                 api.getBank().depositAll();

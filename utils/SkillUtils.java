@@ -2,7 +2,6 @@ package utils;
 
 import org.osbot.rs07.api.model.Item;
 import org.osbot.rs07.api.model.RS2Object;
-import org.osbot.rs07.api.ui.RS2Widget;
 import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.script.MethodProvider;
 
@@ -24,10 +23,10 @@ public final class SkillUtils {
                     if (item.interact("Use")) {
                         if (range != null) {
                             if (range.interact("Use")) {
-                                utils.Sleep.sleepUntil(() -> api.getWidgets().get(270, 14) != null, 5000);
+                                SleepUtils.sleepUntil(() -> api.getWidgets().get(270, 14) != null, 5000);
                                 if (api.getWidgets().get(270, 14) != null) {
                                     if (api.getWidgets().get(270, 14).interact()) {
-                                        utils.Sleep.sleepUntil(() -> !api.getInventory().contains(ingredient) || before_cooking < api.getSkills().getStatic(Skill.COOKING), 60000);
+                                        SleepUtils.sleepUntil(() -> !api.getInventory().contains(ingredient) || before_cooking < api.getSkills().getStatic(Skill.COOKING), 60000);
                                     }
                                 }
                             }
@@ -52,7 +51,7 @@ public final class SkillUtils {
             if(item != null && item.getName().contains("Burnt")){
                 if(item.interact("Drop")){
                     api.log("Dropping burnt food item...");
-                    utils.Sleep.sleepUntil(() -> api.getInventory().getCapacity() < before_capacity, 5000);
+                    SleepUtils.sleepUntil(() -> api.getInventory().getCapacity() < before_capacity, 5000);
                     }
                 }
             }

@@ -4,16 +4,16 @@ import org.osbot.rs07.utility.ConditionalSleep;
 
 import java.util.function.BooleanSupplier;
 
-public final class Sleep extends ConditionalSleep {
+public final class SleepUtils extends ConditionalSleep {
 
     private final BooleanSupplier condition;
 
-    public Sleep(final BooleanSupplier condition, final int timeout) {
+    public SleepUtils(final BooleanSupplier condition, final int timeout) {
         super(timeout);
         this.condition = condition;
     }
 
-    public Sleep(final BooleanSupplier condition, final int timeout, final int interval) {
+    public SleepUtils(final BooleanSupplier condition, final int timeout, final int interval) {
         super(timeout, interval);
         this.condition = condition;
     }
@@ -24,10 +24,10 @@ public final class Sleep extends ConditionalSleep {
     }
 
     public static boolean sleepUntil(final BooleanSupplier condition, final int timeout) {
-        return new Sleep(condition, timeout).sleep();
+        return new SleepUtils(condition, timeout).sleep();
     }
 
     public static boolean sleepUntil(final BooleanSupplier condition, final int timeout, final int interval) {
-        return new Sleep(condition, timeout, interval).sleep();
+        return new SleepUtils(condition, timeout, interval).sleep();
     }
 }
