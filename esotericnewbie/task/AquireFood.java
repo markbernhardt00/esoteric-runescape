@@ -34,7 +34,7 @@ public class AquireFood extends Task {
         boolean chicken_skill = (api.getSkills().getStatic(Skill.ATTACK) < 15 || api.getSkills().getStatic(Skill.STRENGTH) < 15 || api.getSkills().getStatic(Skill.DEFENCE) < 15);
         //Player is of appropriate skill level to easily fight cows
         boolean cow_skill = (api.getSkills().getStatic(Skill.ATTACK) > 14 && api.getSkills().getStatic(Skill.STRENGTH) > 14 && api.getSkills().getStatic(Skill.DEFENCE) > 14);
-        boolean stocked_on_cookables = (api.getInventory().getCapacity() == 0) && (utils.InventoryUtils.countInventoryItems(api, new String[]{"Raw beef", "Raw chicken"}) > 0) ;
+        boolean stocked_on_cookables = (api.getInventory().getEmptySlotCount() == 0) && (utils.InventoryUtils.countInventoryItems(api, new String[]{"Raw beef", "Raw chicken"}) > 0) ;
 
         if(chicken_skill && !stocked_on_cookables){
             aquireRawChicken();
