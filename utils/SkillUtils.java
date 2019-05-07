@@ -55,6 +55,7 @@ public final class SkillUtils {
 
 
     //Drops all items in players inv containing the substring Burnt
+    //TODO: For some reason this is SUPER slow, can we speed this up sometime?
     public static void dropBurntFood(MethodProvider api) {
         for (Item item : api.getInventory().getItems()) {
             int before_capacity = api.getInventory().getCapacity();

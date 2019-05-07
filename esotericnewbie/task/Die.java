@@ -12,7 +12,7 @@ public class Die extends Task {
     //If im 30 or above in every combat skill
     @Override
     public boolean canProcess() {
-        return (api.getSkills().getStatic(Skill.ATTACK) >= 30 || api.getSkills().getStatic(Skill.STRENGTH) >= 30 || api.getSkills().getStatic(Skill.DEFENCE) >= 30);
+        return (api.getSkills().getStatic(Skill.ATTACK) >= 30 && api.getSkills().getStatic(Skill.STRENGTH) >= 30 && api.getSkills().getStatic(Skill.DEFENCE) >= 30);
     }
 
     @Override
