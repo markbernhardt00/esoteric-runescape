@@ -31,7 +31,7 @@ public class AquireFood extends Task {
     //Mostly put this in here for anti-pattern tbh - I remember I used to cook chickens and beef when i was a f2p freshspawn
     public void process() {
         //Player is of appropriate skill level to easily fight chickens
-        boolean chicken_skill = (api.getSkills().getStatic(Skill.ATTACK) < 15 && api.getSkills().getStatic(Skill.STRENGTH) < 15 && api.getSkills().getStatic(Skill.DEFENCE) < 15);
+        boolean chicken_skill = (api.getSkills().getStatic(Skill.ATTACK) < 15 || api.getSkills().getStatic(Skill.STRENGTH) < 15 || api.getSkills().getStatic(Skill.DEFENCE) < 15);
         //Player is of appropriate skill level to easily fight cows
         boolean cow_skill = (api.getSkills().getStatic(Skill.ATTACK) > 14 && api.getSkills().getStatic(Skill.STRENGTH) > 14 && api.getSkills().getStatic(Skill.DEFENCE) > 14);
         boolean stocked_on_cookables = (api.getInventory().getCapacity() == 0) && (utils.InventoryUtils.countInventoryItems(api, new String[]{"Raw beef", "Raw chicken"}) > 0) ;

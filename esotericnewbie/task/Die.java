@@ -17,6 +17,7 @@ public class Die extends Task {
 
     @Override
     public void process() {
+        api.log("Level 30 Combat reached... Congratulations - You REALLY earned it!");
         api.getLogoutTab();
         api.getBot().closeSelf();
     }
