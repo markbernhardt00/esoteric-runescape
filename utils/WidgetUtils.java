@@ -1,5 +1,6 @@
 package utils;
 
+import org.osbot.rs07.api.Settings;
 import org.osbot.rs07.api.ui.RS2Widget;
 import org.osbot.rs07.script.MethodProvider;
 
@@ -39,6 +40,21 @@ public final class WidgetUtils {
         if(!fullInventoryView.isVisible() && fullInventoryView != null){
             if(inventoryIcon != null){
                 inventoryIcon.interact();
+            }
+        }
+    }
+
+    //Disables the players roofs if they aren't already
+    public static void disableRoofs(MethodProvider api){
+        if(!api.getSettings().areRoofsEnabled()){
+            if(api.getSettings().open(Settings.SettingsTab.DISPLAY)){
+                utils.SleepUtils.sleepUntil(() -> api.getWidgets().isVisible(261,35), 3000);
+                if(api.getWidgets().get(261, 35).interact()){
+                    utils.SleepUtils.sleepUntil(() -> api.getWidgets().get(60,15).isVisible(), 3000);
+                    if(api.getWidgets().get(60,15).interact()){
+                        api.log("[WidgetUtils]: Disabled roofs");
+                    }
+                }
             }
         }
     }

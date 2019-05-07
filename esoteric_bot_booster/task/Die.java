@@ -12,7 +12,7 @@ public class Die extends Task {
 
     /*
     Pseudocode:
-    if im above 30 combat level:
+    if im above Level 30 attack, strength and defense:
         I should process this task
      */
     @Override
@@ -25,8 +25,13 @@ public class Die extends Task {
      */
     @Override
     public void process() {
-        api.log("Level 30 Combat reached... Congratulations - You REALLY earned it!");
-        api.getBot().closeSelf();
+        api.log("Level 30 attack, strength and defense reached... Congratulations - You REALLY earned it!");
+
+        try {
+            api.getBot().getScriptExecutor().stop();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }
