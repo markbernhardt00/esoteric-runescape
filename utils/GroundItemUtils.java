@@ -14,10 +14,9 @@ public final class GroundItemUtils {
             GroundItem item = api.getGroundItems().closest(gi -> gi != null && gi.getName().equals(item_name) && api.getMap().canReach(gi));
             if (item != null) //if it exists
             {
-                rv = true;
-
                 boolean closeEnough = item.getPosition().distance(api.myPosition()) < 7;
                 if (closeEnough) {
+                    rv = true;
                     api.log("Picking up item named: " + item_name);
                     if (!item.isVisible()) {
                         api.log("I cant see the item, so I am panning the camera");
