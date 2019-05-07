@@ -1,5 +1,5 @@
 # esoteric-runescape
 
-[https://oldschool.runescape.com/](The Game)
-[https://osbot.org/](The Framework)
-[https://osbot.org/api/](The API)
+[The Game](https://oldschool.runescape.com/)
+[The Framework](https://osbot.org/)
+[The API](https://osbot.org/api/)

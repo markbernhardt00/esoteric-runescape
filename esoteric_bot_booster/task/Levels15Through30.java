@@ -50,6 +50,7 @@ public class Levels15Through30 extends Task{
 
         boolean in_task_area = COW_AREA_1.contains(api.myPosition()) || COW_AREA_2.contains(api.myPosition());
 
+        //TODO: Maybe kill the odd farmer when hes available...
         if(in_task_area) {
             utils.CombatUtils.fightNPC(api, "Cow");
         }
