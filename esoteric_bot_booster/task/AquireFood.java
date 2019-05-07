@@ -22,8 +22,7 @@ public class AquireFood extends Task {
                 I should be getting food
     */
     public boolean canProcess() {
-        boolean out_of_food = (utils.InventoryUtils.countInventoryItems(api, new String[]{"Cooked meat", "Cooked chicken"}) == 0) && !api.getCombat().isFighting() && !api.myPlayer().isMoving();
-        return out_of_food;
+        return (utils.InventoryUtils.countInventoryItems(api, new String[]{"Cooked meat", "Cooked chicken"}) == 0) && !api.getCombat().isFighting() && !api.myPlayer().isMoving();
     }
 
     @Override
@@ -57,14 +56,14 @@ public class AquireFood extends Task {
 
         if (api.getSkills().getStatic(Skill.ATTACK) > 14 && api.getSkills().getStatic(Skill.STRENGTH) > 14 && api.getSkills().getStatic(Skill.DEFENCE) > 14){
             task_area = COW_AREA_1;
-            api.log("[AquireFood]: Task area is COW_AREA_1");
+            api.log("[AcquireFood]: Task area is COW_AREA_1");
         }
         else {
             task_area = CHICKEN_COOP_AREA_1;
-            api.log("[AquireFood]: Task area is CHICKEN_COOP_AREA_1...");
+            api.log("[AcquireFood]: Task area is CHICKEN_COOP_AREA_1...");
         }
 
-        api.log("[AquireFood]: Web-walking to task area...");
+        api.log("[AcquireFood]: Web-walking to task area...");
         api.getWalking().webWalk(task_area);
     }
 
@@ -72,10 +71,10 @@ public class AquireFood extends Task {
         utils.WidgetUtils.keepInventoryOpen(api);
         boolean in_chicken_area = (CHICKEN_COOP_AREA_1.contains(api.myPosition()));
         if(in_chicken_area){
-            api.log("[AquireFood]: Aquiring 'Raw chicken'...");
+            api.log("[AcquireFood]: Acquiring 'Raw chicken'...");
             //Pick up Raw chicken, if there is no Raw chicken you can pick up, hop worlds...
             if(!utils.GroundItemUtils.pickUpItems(api, new String[]{"Raw chicken"})){
-                api.log("[AquireFood]: Couldn't find any 'Raw chicken' here...");
+                api.log("[AcquireFood]: Couldn't find any 'Raw chicken' here...");
                 utils.CombatUtils.fightNPC(api, "Chicken");
             }
         }
@@ -107,7 +106,7 @@ public class AquireFood extends Task {
             utils.SkillUtils.cookOnRange(api, ingredient_names);
         }
         else{
-            api.log("[AquireFood]: Web-walking to RANGE_AREA...");
+            api.log("[AcquireFood]: Web-walking to RANGE_AREA...");
             api.getWalking().webWalk(RANGE_AREA.getRandomPosition());
         }
     }
