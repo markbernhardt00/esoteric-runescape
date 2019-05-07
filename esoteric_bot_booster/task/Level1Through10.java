@@ -5,7 +5,6 @@ import org.osbot.rs07.script.MethodProvider;
 
 public class Level1Through10 extends Task {
 
-    //Chicken
     private static final Area CHICKEN_COOP_AREA_2 = new Area(new int[][]{{ 3172, 3307 }, { 3172, 3303 }, { 3168, 3300 }, { 3168, 3298 }, { 3169, 3297 }, { 3169, 3296 }, { 3168, 3295 }, { 3168, 3290 }, { 3170, 3288 }, { 3173, 3288 }, { 3174, 3287 }, { 3177, 3287 }, { 3178, 3288 }, { 3184, 3288 }, { 3186, 3290 }, { 3186, 3294 }, { 3187, 3295 }, { 3187, 3298 }, { 3186, 3299 }, { 3186, 3301 }, { 3184, 3303 }, { 3183, 3303 }, { 3182, 3304 }, { 3180, 3304 }, { 3180, 3308 }, { 3172, 3308 }, { 3172, 3304 }});
     private static final Area CHICKEN_COOP_AREA_1 = new Area(new int[][]{{ 3225, 3301 }, { 3225, 3295 }, { 3231, 3295 }, { 3231, 3287 }, { 3237, 3287 }, { 3237, 3290 }, { 3237, 3297 }, { 3238, 3298 }, { 3238, 3300 }, { 3236, 3302 }, { 3225, 3302 }});
 
@@ -13,7 +12,6 @@ public class Level1Through10 extends Task {
         super(api);
     }
 
-    @Override
     /*
     Pseudocode:
     if have_enough_food:
@@ -21,6 +19,7 @@ public class Level1Through10 extends Task {
             if im not moving or in a fight
                 I should process this task
     */
+    @Override
     public boolean canProcess() {
         boolean out_of_food = (utils.InventoryUtils.countInventoryItems(api, new String[]{"Cooked meat", "Cooked chicken"}) == 0);
         boolean not_busy = !api.myPlayer().isMoving() && !api.getCombat().isFighting();
@@ -28,7 +27,6 @@ public class Level1Through10 extends Task {
         return inside_skill_range && not_busy && !out_of_food;
     }
 
-    @Override
     /*
     Pseudocode:
     if I have the energy and am not running: TODO: This should be handled elsewhere
@@ -40,6 +38,7 @@ public class Level1Through10 extends Task {
     if im in chicken coop 2:
         Fight a chicken (3/4 chance) or goblin (1/4 chance) NOTE: There are goblins that wander into this chicken coop
     */
+    @Override
     public void process() {
 
         utils.PlayerUtils.handleEnergy(api);

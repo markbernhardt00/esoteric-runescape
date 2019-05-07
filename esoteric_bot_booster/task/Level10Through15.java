@@ -15,7 +15,7 @@ public class Level10Through15 extends Task {
         super(api);
     }
 
-    @Override
+
     /*
     Pseudocode:
     if have_enough_food:
@@ -23,6 +23,7 @@ public class Level10Through15 extends Task {
             if im not moving or in a fight
                 I should process this task
     */
+    @Override
     public boolean canProcess() {
         boolean out_of_food = (utils.InventoryUtils.countInventoryItems(api, new String[]{"Cooked meat", "Cooked chicken"}) == 0);
         boolean not_busy = !api.myPlayer().isMoving() && !api.getCombat().isFighting();
@@ -31,7 +32,6 @@ public class Level10Through15 extends Task {
         return respects_upper_bound && respects_lower_bound && not_busy && !out_of_food;
     }
 
-    @Override
     /*
     Pseudocode:
     if I have the energy and am not running: TODO: This should be handled elsewhere
@@ -45,6 +45,7 @@ public class Level10Through15 extends Task {
     else:
         Go to the appropriate task area (goblin_spider area for < 13 combat level, giant_rat_area for >= 13 combat level)
     */
+    @Override
     public void process() {
 
         utils.PlayerUtils.handleEnergy(api);
@@ -70,7 +71,7 @@ public class Level10Through15 extends Task {
 
     }
 
-    //Choose a random enemy between Goblin or Spider to fight
+    //Choose a random enemy between Goblin or Spider to fight to promote behavioral diversity
     private void fightRandomNPC(){
         int rand_int = utils.RandomUtils.random(1, 2);
 

@@ -8,7 +8,7 @@ public final class InventoryUtils {
     private InventoryUtils(){}
 
     //returns the amount of item with names in item_names array that are in players inventory
-    //Useful for checking the amount of food items a player is holding
+    //Not so sure about the complexity on this one... Probably something better out there.
     public static int countInventoryItems(MethodProvider api, String[] item_names){
 
         int rv = 0;

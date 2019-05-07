@@ -8,7 +8,7 @@ import org.osbot.rs07.script.MethodProvider;
 public final class PlayerUtils {
     private PlayerUtils(){}
 
-    //Toggles the players run energy when they have atleast 65 energy
+    //Toggles the players run energy when they have at least 65 energy
     public static void handleEnergy(MethodProvider api){
         if (api.getSettings().getRunEnergy() > 65 && !api.getSettings().isRunning()) {
             api.log("Energy exceeded 65, toggling RUN to ACTIVE");
@@ -30,9 +30,10 @@ public final class PlayerUtils {
         return closest_position;
     }
 
-    public static Boolean eatFood(MethodProvider api, String[] food_names, int percent_hp_threshhold) {
+    //Eats any food with name in food_names String area when characters HP drops below int percent_hp_threshold
+    public static Boolean eatFood(MethodProvider api, String[] food_names, int percent_hp_threshold) {
 
-        if (api.myPlayer().getHealthPercent() < percent_hp_threshhold) {
+        if (api.myPlayer().getHealthPercent() < percent_hp_threshold) {
             Inventory player_inventory = api.getInventory();
             int before_eating_capacity = player_inventory.getCapacity();
             for (String food_name : food_names) {

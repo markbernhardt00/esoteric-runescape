@@ -32,7 +32,8 @@ public final class WidgetUtils {
         }
     }
 
-    public static void keepInventoryOpen(MethodProvider api){
+    //Forces the inventory open from any state
+    public static void forceInventoryOpen(MethodProvider api){
         RS2Widget inventoryIcon = api.getWidgets().get(164,53);
         RS2Widget fullInventoryView = api.getWidgets().get(164,66);
         if(!fullInventoryView.isVisible() && fullInventoryView != null){

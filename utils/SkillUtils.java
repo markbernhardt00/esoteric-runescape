@@ -10,16 +10,6 @@ public final class SkillUtils {
     private SkillUtils() {
     }
 
-    public static void chopTree(MethodProvider api, String[] tree_name) {
-        RS2Object tree = api.getObjects().closest(obj -> obj != null && obj.getName().equals(tree_name) && api.getMap().canReach(obj));
-
-        if (!api.myPlayer().isAnimating()) {
-            if (tree != null && tree.interact("Chop down")) {
-                new Sleep(() -> api.myPlayer().isAnimating() || !tree.exists(), 5000).sleep();
-            }
-
-        }
-    }
 
     //pre: Player can reach a range
     //Cooks all food with ingredient_name in ingredient_names
@@ -55,7 +45,7 @@ public final class SkillUtils {
 
 
     //Drops all items in players inv containing the substring Burnt
-    //TODO: For some reason this is SUPER slow, can we speed this up sometime?
+    //TODO: For some reason this is SUPER slow, can I speed this up sometime?
     public static void dropBurntFood(MethodProvider api) {
         for (Item item : api.getInventory().getItems()) {
             int before_capacity = api.getInventory().getCapacity();

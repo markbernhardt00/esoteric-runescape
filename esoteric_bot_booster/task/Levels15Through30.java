@@ -13,7 +13,7 @@ public class Levels15Through30 extends Task{
         super(api);
     }
 
-    @Override
+
     /*
     Pseudocode:
     if have_enough_food:
@@ -21,6 +21,7 @@ public class Levels15Through30 extends Task{
             if im not moving or in a fight
                 I should process this task
     */
+    @Override
     public boolean canProcess() {
         //redundant declarations for readability only...
         boolean out_of_food = (utils.InventoryUtils.countInventoryItems(api, new String[]{"Cooked meat", "Cooked chicken"}) == 0);
@@ -30,7 +31,6 @@ public class Levels15Through30 extends Task{
         return respects_upper_bound && respects_lower_bound && not_busy && !out_of_food;
     }
 
-    @Override
     /*
     Pseudocode:
     if I have the energy and am not running: TODO: This should be handled elsewhere
@@ -42,9 +42,8 @@ public class Levels15Through30 extends Task{
     else:
         Go to a random cow area
     */
+    @Override
     public void process() {
-
-
         utils.PlayerUtils.handleEnergy(api);
         utils.CombatUtils.handleStyleChange(api, 30);
 
@@ -57,10 +56,9 @@ public class Levels15Through30 extends Task{
         else {
             walkToRandomTaskArea();
         }
-
-
     }
 
+    //Walks the player to a random cow area to promote behavioral diversity
     private void walkToRandomTaskArea(){
         int random_choice = utils.RandomUtils.random(1, 2);
         if(random_choice == 1) {

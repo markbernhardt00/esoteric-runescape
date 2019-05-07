@@ -12,7 +12,7 @@ public final class CombatUtils {
     }
 
     /*
-    This method will return 'problem-free' NPC with getName() = name or if none are available it will return NPC == null (bad-btw)
+    This method will return 'problem-free' NPC with getName() = name or if none are available it will return NPC == null
     NOTE: Worthy defined as existing, reachable, has name = name, is not in dying state (0% hp),
     and not interacted with by somebody else.
     */
@@ -40,6 +40,7 @@ public final class CombatUtils {
         return worthyOpponent;
     }
 
+    //Will fight the nearest 'Worthy' (see getWorthyOpponent) NPC with name NPC_name. Return the NPC (can be null)
     public static NPC fightNPC(MethodProvider api, String NPC_name) {
         //if im not in the middle of something...
         if (!api.getCombat().isFighting() && !api.myPlayer().isMoving() && !api.myPlayer().isUnderAttack()) {
@@ -75,8 +76,10 @@ public final class CombatUtils {
         return null;
 
     }
-
-    //This method will change styles to balance a characters levels up to the given int
+    /*
+    This method will change styles to balance a characters levels up to the given int
+    Example usage: handleStyleChange(api, 15) -- Att 10 -> 15 switch to Str... Str 10 -> 15 switch to Def... Def 10 -> 15
+     */
     public static void handleStyleChange(MethodProvider api, int level) {
         if (api.getConfigs().get(43) != 0 && api.getSkills().getStatic(Skill.ATTACK) < level) {
             api.log("Combat training milestone: Player is now attack skill level " + String.valueOf(level) + ". Switching to strength training...");

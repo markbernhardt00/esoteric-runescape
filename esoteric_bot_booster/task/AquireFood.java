@@ -14,20 +14,21 @@ public class AquireFood extends Task {
         super(api);
     }
 
-    @Override
+
     /*
     Pseudocode:
-    if im out of food:
-            if im not moving or in a fight:
-                I should be getting food
-    */
-    public boolean canProcess() {
-        return (utils.InventoryUtils.countInventoryItems(api, new String[]{"Cooked meat", "Cooked chicken"}) == 0) && !api.getCombat().isFighting() && !api.myPlayer().isMoving();
-    }
-
+    if the player is below 15 combat level:
+        acquire raw chicken
+        if the players inventory is full and has raw chicken:
+            Go to the range in lumbridge and cook the raw chicken
+            Drop the burnt chicken
+    if the player is above 14 combat level:
+        acquire raw beef
+        if the players inventory is full and has raw beef:
+            Go to the range in lumbridge and cook the raw beef
+            Drop the burnt meat
+     */
     @Override
-    //This gets the player food when they are out in the way most available to all players...
-    //Mostly put this in here for anti-pattern tbh - I remember I used to cook chickens and beef when i was a f2p freshspawn
     public void process() {
         //Player is of appropriate skill level to easily fight chickens
         boolean chicken_skill = (api.getSkills().getStatic(Skill.ATTACK) < 15 || api.getSkills().getStatic(Skill.STRENGTH) < 15 || api.getSkills().getStatic(Skill.DEFENCE) < 15);
@@ -36,20 +37,30 @@ public class AquireFood extends Task {
         boolean stocked_on_cookables = (api.getInventory().getEmptySlotCount() == 0) && (utils.InventoryUtils.countInventoryItems(api, new String[]{"Raw beef", "Raw chicken"}) > 0) ;
 
         if(chicken_skill && !stocked_on_cookables){
-            aquireRawChicken();
+            acquireRawChicken();
         }
         else if (cow_skill && !stocked_on_cookables) {
             aquireRawBeef();
         }
         else if (stocked_on_cookables){
-            //walk to range for cooking
             api.getWalking().webWalk(RANGE_AREA.getCentralPosition());
-
             cookAtRange(new String[]{"Raw beef", "Raw chicken"});
-            dropBurntFood();
+            utils.SkillUtils.dropBurntFood(api);
         }
     }
 
+    @Override
+    /*
+    Pseudocode:
+    if im out of food:
+            if im not moving or in a fight:
+                I should process this task
+    */
+    public boolean canProcess() {
+        return (utils.InventoryUtils.countInventoryItems(api, new String[]{"Cooked meat", "Cooked chicken"}) == 0) && !api.getCombat().isFighting() && !api.myPlayer().isMoving();
+    }
+
+    //Walks the user to a chicken coop or cow pen depending on what kind of ingredient they need
     private void walkToTaskArea(){
 
         Area task_area;
@@ -67,8 +78,9 @@ public class AquireFood extends Task {
         api.getWalking().webWalk(task_area);
     }
 
-    private void aquireRawChicken(){
-        utils.WidgetUtils.keepInventoryOpen(api);
+    //Loots raw chicken from chicken coop, or fights a chicken if there is none already on the ground
+    private void acquireRawChicken(){
+        utils.WidgetUtils.forceInventoryOpen(api);
         boolean in_chicken_area = (CHICKEN_COOP_AREA_1.contains(api.myPosition()));
         if(in_chicken_area){
             api.log("[AcquireFood]: Acquiring 'Raw chicken'...");
@@ -82,9 +94,9 @@ public class AquireFood extends Task {
             walkToTaskArea();
         }
     }
-
+    //Loots raw beef from cow pen, or fights a cow if there is none already on the ground
     private void aquireRawBeef(){
-        utils.WidgetUtils.keepInventoryOpen(api);
+        utils.WidgetUtils.forceInventoryOpen(api);
         //Is the player inside the cow area
         boolean in_cow_area = (COW_AREA_1.contains(api.myPosition()));
 
@@ -99,6 +111,7 @@ public class AquireFood extends Task {
         }
     }
 
+    //Cooks any ingredient with name inside the ingredient_names array
     private void cookAtRange(String[] ingredient_names){
         //Is the player inside the range area
         boolean in_range_area = (RANGE_AREA.contains(api.myPosition()));
@@ -109,9 +122,5 @@ public class AquireFood extends Task {
             api.log("[AcquireFood]: Web-walking to RANGE_AREA...");
             api.getWalking().webWalk(RANGE_AREA.getRandomPosition());
         }
-    }
-
-    private void dropBurntFood(){
-        utils.SkillUtils.dropBurntFood(api);
     }
 }

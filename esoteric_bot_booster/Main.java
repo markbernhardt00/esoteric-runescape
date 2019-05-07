@@ -12,7 +12,7 @@ public class Main extends Script {
     private ArrayList<Task> tasks = new ArrayList<>();
     @Override
     public void onStart(){
-        utils.WidgetUtils.keepInventoryOpen(this);
+        utils.WidgetUtils.forceInventoryOpen(this);
 
         tasks.add(new FreshSpawn(this));
         tasks.add(new Die(this));

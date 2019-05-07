@@ -23,13 +23,13 @@ public class FreshSpawn extends Task{
         return (utils.InventoryUtils.countInventoryItems(api, new String[]{"Bucket", "Pot", "Bread", "Shortbow"}) == 4);
     }
 
-    @Override
     /*
     Pseudocode:
     equip Bronze sword and Wooden shield
     go to lumbridge upper bank
     drop off tutorial island garbage
      */
+    @Override
     public void process() {
         equipStarterEquipment();
         dropAllToBank();
@@ -44,6 +44,7 @@ public class FreshSpawn extends Task{
             }
             api.log("[FreshSpawn]: Equipped Bronze sword");
         }
+
         if(api.getInventory().contains("Wooden shield")){
             if(api.getEquipment().equip(EquipmentSlot.WEAPON, "Wooden shield")){
                 Sleep.sleepUntil(() -> api.getEquipment().contains("Wooden shield"), 5000);
