@@ -12,14 +12,24 @@ public class FreshSpawn extends Task{
         super(api);
     }
 
+    /*
+    Pseudocode:
+    if the character is detected to be a fresh spawn off tutorial island:
+        I should process this task
+     */
     @Override
     public boolean canProcess() {
-        //This is a lazy way of determining whether or not a char is a fresh spawn.
-        boolean is_fresh_spawn = (utils.InventoryUtils.countInventoryItems(api, new String[]{"Bucket", "Pot", "Bread", "Shortbow"}) == 4);
-        return is_fresh_spawn;
+        //This is a lazy way of determining whether or not a char is a fresh spawn. TODO: Less vulnerable solution
+        return (utils.InventoryUtils.countInventoryItems(api, new String[]{"Bucket", "Pot", "Bread", "Shortbow"}) == 4);
     }
 
     @Override
+    /*
+    Pseudocode:
+    equip Bronze sword and Wooden shield
+    go to lumbridge upper bank
+    drop off tutorial island garbage
+     */
     public void process() {
         equipStarterEquipment();
         dropAllToBank();

@@ -9,6 +9,11 @@ public class RecuperateHealth extends Task{
     }
 
     @Override
+    /*
+    Pseudocode:
+    if my health is below 80%:
+        I should process this task
+     */
     public boolean canProcess() {
         return api.myPlayer().getHealthPercent() < 80;
     }

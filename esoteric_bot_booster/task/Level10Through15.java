@@ -21,7 +21,7 @@ public class Level10Through15 extends Task {
     if have_enough_food:
         if im above level 9 and below level 15 in any combat skill:
             if im not moving or in a fight
-                I should be fighting goblins and spiders
+                I should process this task
     */
     public boolean canProcess() {
         boolean out_of_food = (utils.InventoryUtils.countInventoryItems(api, new String[]{"Cooked meat", "Cooked chicken"}) == 0);
@@ -32,27 +32,42 @@ public class Level10Through15 extends Task {
     }
 
     @Override
+    /*
+    Pseudocode:
+    if I have the energy and am not running: TODO: This should be handled elsewhere
+        toggle run
+    if I'm ready for a stance switch:
+        stance switch
+    if im in a the goblin_spider area:
+        Fight random(goblin, spider)
+    else if im in the giant_rat_area:
+        Fight a giant rat
+    else:
+        Go to the appropriate task area (goblin_spider area for < 13 combat level, giant_rat_area for >= 13 combat level)
+    */
     public void process() {
+
+        utils.PlayerUtils.handleEnergy(api);
+        utils.CombatUtils.handleStyleChange(api, 15);
+
         Position my_pos = api.myPosition();
-        Area task_area = (api.getSkills().getStatic(Skill.ATTACK) < 15 || api.getSkills().getStatic(Skill.STRENGTH) < 15 || api.getSkills().getStatic(Skill.DEFENCE) < 15) ? GOBLIN_SPIDER_AREA : GIANT_RAT_AREA;
+        Area task_area = (api.getSkills().getStatic(Skill.ATTACK) < 13 || api.getSkills().getStatic(Skill.STRENGTH) < 13 || api.getSkills().getStatic(Skill.DEFENCE) < 13) ? GOBLIN_SPIDER_AREA : GIANT_RAT_AREA;
 
         boolean in_goblin_spider_area = GOBLIN_SPIDER_AREA.contains(my_pos);
         boolean in_giant_rat_area = GIANT_RAT_AREA.contains(my_pos);
 
         if(in_goblin_spider_area) {
             fightRandomNPC();
-            utils.CombatUtils.handleStyleChange(api, 15);
         }
         else if (in_giant_rat_area){
             utils.CombatUtils.fightNPC(api, "Giant rat");
-            utils.CombatUtils.handleStyleChange(api, 15);
         }
         else {
             api.log("[Levels10Through15]: Outside of task area - walking to task area...");
             api.getWalking().webWalk(task_area.getRandomPosition());
         }
 
-        utils.PlayerUtils.handleEnergy(api);
+
     }
 
     //Choose a random enemy between Goblin or Spider to fight

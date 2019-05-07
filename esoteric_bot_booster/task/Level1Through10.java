@@ -19,7 +19,7 @@ public class Level1Through10 extends Task {
     if have_enough_food:
         if im below level 10 in any combat skill:
             if im not moving or in a fight
-                I should be fighting chickens
+                I should process this task
     */
     public boolean canProcess() {
         boolean out_of_food = (utils.InventoryUtils.countInventoryItems(api, new String[]{"Cooked meat", "Cooked chicken"}) == 0);
@@ -29,7 +29,21 @@ public class Level1Through10 extends Task {
     }
 
     @Override
+    /*
+    Pseudocode:
+    if I have the energy and am not running: TODO: This should be handled elsewhere
+        toggle run
+    if I'm ready for a stance switch:
+        stance switch
+    if im in chicken coop 1:
+        Fight a chicken
+    if im in chicken coop 2:
+        Fight a chicken (3/4 chance) or goblin (1/4 chance) NOTE: There are goblins that wander into this chicken coop
+    */
     public void process() {
+
+        utils.PlayerUtils.handleEnergy(api);
+        utils.CombatUtils.handleStyleChange(api, 10);
 
         boolean in_chicken_coop_area_1 = CHICKEN_COOP_AREA_1.contains(api.myPosition());
         boolean in_chicken_coop_area_2 = CHICKEN_COOP_AREA_2.contains(api.myPosition());
@@ -44,8 +58,7 @@ public class Level1Through10 extends Task {
             walkToRandomTaskArea();
         }
 
-        utils.PlayerUtils.handleEnergy(api);
-        utils.CombatUtils.handleStyleChange(api, 10);
+
     }
 
     //Walks us to a chicken coop
@@ -60,7 +73,7 @@ public class Level1Through10 extends Task {
             api.getWalking().webWalk(CHICKEN_COOP_AREA_2.getRandomPosition());
         }
     }
-    //There are goblins that wander into this chicken coop... why not attack every once in awhile for some variety
+    //There are goblins that wander into this chicken coop... 3/4 chance to attack a chicken 1/4 chance to attack a goblin
     private void fightRandomChickenCoop2Enemy(){
         int rand_int = utils.RandomUtils.random(0, 4);
         if(rand_int < 4){
