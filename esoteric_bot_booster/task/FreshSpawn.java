@@ -1,4 +1,4 @@
-package esotericnewbie.task;
+package esoteric_bot_booster.task;
 
 import org.osbot.rs07.api.map.constants.Banks;
 import org.osbot.rs07.api.model.RS2Object;

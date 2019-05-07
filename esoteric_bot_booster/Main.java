@@ -1,12 +1,12 @@
-package esotericnewbie;
+package esoteric_bot_booster;
 
-import esotericnewbie.task.*;
+import esoteric_bot_booster.task.*;
 import org.osbot.rs07.script.Script;
 import org.osbot.rs07.script.ScriptManifest;
 
 import java.util.ArrayList;
 
-@ScriptManifest(author = "EsotericRS", info = "Trains a fresh account to 30 combat!", logo = "https://imgur.com/a/3Gr2vNy", name = "EsotericNewbie", version = 0.95)
+@ScriptManifest(author = "EsotericRS", info = "Trains a fresh account to 30 combat!", logo = "https://imgur.com/a/3Gr2vNy", name = "Esoteric Bot Booster", version = 0.95)
 public class Main extends Script {
 
     ArrayList<Task> tasks = new ArrayList<Task>();
