@@ -1,6 +1,7 @@
 package esoteric_bot_booster.task;
 
 import org.osbot.rs07.api.map.Area;
+import org.osbot.rs07.api.map.Position;
 import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.script.MethodProvider;
 
@@ -8,7 +9,8 @@ public class AquireFood extends Task {
 
     private static final Area CHICKEN_COOP_AREA_1 = new Area(new int[][]{{ 3225, 3301 }, { 3225, 3295 }, { 3231, 3295 }, { 3231, 3287 }, { 3237, 3287 }, { 3237, 3290 }, { 3237, 3297 }, { 3238, 3298 }, { 3238, 3300 }, { 3236, 3302 }, { 3225, 3302 }});
     private static final Area COW_AREA_1 = new Area(new int[][]{{ 3193, 3300 }, { 3193, 3286 }, { 3195, 3284 }, { 3196, 3282 }, { 3200, 3282 }, { 3201, 3283 }, { 3206, 3283 }, { 3207, 3284 }, { 3212, 3284 }, { 3213, 3285 }, { 3213, 3289 }, { 3214, 3290 }, { 3214, 3293 }, { 3211, 3295 }, { 3211, 3296 }, { 3210, 3297 }, { 3210, 3302 }, { 3206, 3302 }, { 3204, 3301 }, { 3200, 3301 }, { 3200, 3302 }, { 3195, 3302 }});
-    private static final Area RANGE_AREA = new Area(3237, 3197, 3230, 3195);
+    private static final Area RANGE_AREA = new Area(3237, 3198, 3229, 3194);
+    private static final Position RANGE_POSITION = new Position(3235,3196,0);
 
     public AquireFood(MethodProvider api){
         super(api);
@@ -120,7 +122,7 @@ public class AquireFood extends Task {
         }
         else{
             api.log("[AcquireFood]: Web-walking to RANGE_AREA...");
-            api.getWalking().webWalk(RANGE_AREA.getRandomPosition());
+            api.getWalking().webWalk(RANGE_POSITION);
         }
     }
 }
