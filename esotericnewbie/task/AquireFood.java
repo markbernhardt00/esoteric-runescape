@@ -69,6 +69,7 @@ public class AquireFood extends Task {
     }
 
     private void aquireRawChicken(){
+        utils.WidgetUtils.keepInventoryOpen(api);
         boolean in_chicken_area = (CHICKEN_COOP_AREA_1.contains(api.myPosition()));
         if(in_chicken_area){
             api.log("[AquireFood]: Aquiring 'Raw chicken'...");
@@ -84,6 +85,7 @@ public class AquireFood extends Task {
     }
 
     private void aquireRawBeef(){
+        utils.WidgetUtils.keepInventoryOpen(api);
         //Is the player inside the cow area
         boolean in_cow_area = (COW_AREA_1.contains(api.myPosition()));
 
